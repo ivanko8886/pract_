@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="/logo.png"/>
+  <link rel="stylesheet" href="/style4.css" type="text/css" />
+
+  <title>Таблица заказов.вид администротора.</title>
+  <style>
+    .row {
+      display: flex;
+      margin-bottom: 10px;
+    }
+    .row input {
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body style="color:#483D8B; background-color:#DCDCDC">
+<h1>База данных</h1>
+
+<button  type="button" id="butt1" class="sortButton" data-column="0">Сортировать по столбцу 1</button>
+<button  type="button" id="butt2" class="sortButton" data-column="1">Сортировать по столбцу 2</button>
+<button  type="button" id="butt3" class="sortButton" data-column="2">Сортировать по столбцу 3</button>
+<button  type="button" id="butt4" class="sortButton" data-column="3">Сортировать по столбцу 4</button>
+<button  type="button" id="butt5" class="sortButton" data-column="4">Сортировать по столбцу 5</button>
+<p></p>
+<br>
+<form action="start_screen.html" target="_blank">
+  <button style="border-radius: 5px; left: 1200px   ;position: absolute;top: 30px">Переход на стартовый экран</button>
+</form>
+<a style="position: absolute ;float: left;left: 10px">id</a>
+<a style="position: absolute ;float: left;left: 185px">name</a>
+<a style="position: absolute ;float: left;left: 360px">count</a>
+<a style="position: absolute ;float: left;left: 535px">price</a>
+<a style="position: absolute ;float: left;left: 710px">cost</a>
+<p></p><br>
+<div id="container"></div>
+
+<button  id="addRow">Добавить строку</button>
+<button style="margin: 10px 10px 10px 10px" id="saveData">Сохранить данные в базе</button>
+<!-- Добавляем кнопку для скачивания таблицы -->
+<a style="margin: 10px 10px 10px 10px" id="downloadTable" href="widget_of_table_base.php" download="data.txt">Скачать таблицу</a>
+<p></p>
+<!-- Добавляем кнопки для загрузки и добавления файлов -->
+<input type="file" id="uploadFile" accept=".txt">
+<button id="replaceFile">Заменить базу</button>
+<p></p>
+
+<script>
+  document.querySelectorAll('.sortButton').forEach(button => {
+    button.addEventListener('click', function() {
+      const columnIndex = this.getAttribute('data-column');
+      const sortingOrder = this.dataset.sortingOrder || 'asc'; // Получаем текущий порядок сортировки или устанавливаем по умолчанию "asc"
+
+      fetch('sorting.php', {
+        method: 'POST',
+        body: 'columnIndex=' + columnIndex + '&sortingOrder=' + sortingOrder, // Передаем также порядок сортировки
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+              .then(response => response.text())
+              .then(sortedData => {
+                // Обновляем порядок сортировки для кнопки
+                this.dataset.sortingOrder = sortingOrder === 'asc' ? 'desc' : 'asc';
+
+                // Обновляем содержимое контейнера с данными
+                document.getElementById('container').innerHTML = '';
+                sortedData.split('\n').forEach(rowData => {
+                  if (rowData.trim() !== '') {
+                    let rowDiv = createRow(rowData.split(' '));
+                    document.getElementById('container').appendChild(rowDiv);
+                  }
+                });
+              });
+    });
+  });
+  document.getElementById('addRow').addEventListener('click', function() {
+    let rowDiv = createRow(['', '', '', '', '']);
+    document.getElementById('container').appendChild(rowDiv);
+  });
+
+  document.getElementById('saveData').addEventListener('click', function() {
+    let rows = [...document.querySelectorAll('.row')];
+    let data = rows.map(row => {
+      let inputs = [...row.querySelectorAll('input')];
+      return inputs.map(input => input.value).join(' ');
+    });
+    fetch('index.php', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  });
+
+  // Добавляем обработчик события для кнопки "Заменить файл"
+  document.getElementById('replaceFile').addEventListener('click', function() {
+    let fileInput = document.getElementById('uploadFile');
+    if (fileInput.files.length > 0) {
+      let file = fileInput.files[0];
+      let formData = new FormData();
+      formData.append('file', file);
+
+      fetch('replace_file.php', {
+        method: 'POST',
+        body: formData,
+      }).then(response => {
+        // Обновляем страницу после замены файла
+        location.reload();
+      });
+    }
+  });
+
+  // Добавляем обработчик события для кнопки "Добавить к файлу"
+
+
+  function createRow(data) {
+    let rowDiv = document.createElement('div');
+    rowDiv.classList.add('row');
+
+    data.forEach(item => {
+      let input = document.createElement('input');
+      input.value = item;
+      rowDiv.appendChild(input);
+    });
+
+    let deleteButton = document.createElement('button');
+    deleteButton.innerText = 'Удалить';
+    deleteButton.addEventListener('click', function() {
+      rowDiv.remove();
+    });
+    rowDiv.appendChild(deleteButton);
+
+    return rowDiv;
+  }
+
+  // Load data from the server
+  fetch('index.php')
+          .then(response => response.json())
+          .then(data => {
+            data.forEach(rowData => {
+              let rowDiv = createRow(rowData);
+              document.getElementById('container').appendChild(rowDiv);
+            });
+          });
+
+</script>
+</body>
+</html>

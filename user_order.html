@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/png" href="/logo.png"/>
+
+  <link rel="stylesheet" href="/style3.css" type="text/css" />
+  <title>Заказ товара.вид пользователя.</title>
+</head>
+<body>
+
+<h1 class="heading">Заказ товаров</h1>
+
+<form action="process_of_adding_info.php" method="post">
+  <div class="wrapper">
+  <label for="data1">Данные id:</label>
+  <input placeholder="введите id" type="text" id="data1" name="data1" required><br>
+  <p></p>
+  <label for="data2">Данные name:</label>
+  <input placeholder="введите name" type="text" id="data2" name="data2" required><br>
+  <p></p>
+  <label for="data3">Данные count:</label>
+  <input placeholder="введите count" type="text" id="data3" name="data3" required><br>
+  <p></p>
+  <label for="data4">Данные price:</label>
+  <input placeholder="введите price" type="text" id="data4" name="data4" required><br>
+  <p></p>
+  <label for="data5">Данные cost:</label>
+  <input placeholder="введите cost" type="text" id="data5" name="data5" required><br>
+      <p></p>
+
+  <button style="border-radius: 5px;" class="save-btn" type="submit">Записать в файл</button><p></p>
+
+  </div>
+</form>
+<form action="main_widget.html" target="_blank">
+  <button style="border-radius: 5px;float: left">Переход на главный экран</button>
+</form><form action="start_screen.html" target="_blank">
+  <button style="border-radius: 5px; float: right">Переход на стартовый экран</button>
+</form>
+</body>
+</html>
